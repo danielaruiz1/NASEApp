@@ -63,15 +63,15 @@ function SortableOrder({ order }: SortableOrderProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card className="mb-3 cursor-grab active:cursor-grabbing flex flex-row items-center justify-between">
-        <CardHeader className="p-3 border-1 ml-4">
-          <div className="flex items-center justify-between">
-            <span className="border-1 text-sm font-medium">{order.title}</span>
+      <Card className="mb-3 cursor-grab active:cursor-grabbing flex flex-row flex-wrap items-center">
+        <CardHeader className="border-1 w-30 flex p-0 ml-4 flex-1 min-w-30 items-center">
+          <div className="flex items-center justify-between min-w-0">
+            <span className="text-sm font-medium flex-1 min-w-0 whitespace-normal break-words">{order.title}</span>
           </div>
         </CardHeader>
-        <CardContent className="border-1 flex flex-row items-center">
-          <p className="border-1 text-xs text-muted-foreground pr-3">{order.customer}</p>
-          <p className="border-1 mt-1 text-xs font-mono">{order.batchCode}</p>
+        <CardContent className="border-1 px-0 flex justify-start min-w-10 mr-4 ml-4">
+          <p className="border-1 text-xs text-muted-foreground w-20 min-w-20 whitespace-normal break-words">{order.customer}</p>
+          <p className="border-1 text-xs font-mono w-40 whitespace-normal break-words">{order.batchCode}</p>
         </CardContent>
       </Card>
     </div>
