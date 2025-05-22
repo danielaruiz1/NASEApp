@@ -10,7 +10,7 @@ import { AlertCircle, CheckCircle2, Clock, MoveHorizontal } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
-type OrderStatus = "pending" | "processing" | "completed"
+type OrderStatus = "processing" | "completed"
 
 interface Order {
   id: string
@@ -21,22 +21,6 @@ interface Order {
   priority: "low" | "medium" | "high"
 }
 const initialOrders: Order[] = [
-  {
-    id: "order-1",
-    title: "Red Globe - 10 Pallets",
-    customer: "FreshMart EU",
-    status: "pending",
-    batchCode: "RG-2023-05-12-001",
-    priority: "high",
-  },
-  {
-    id: "order-2",
-    title: "Crimson - 5 Pallets",
-    customer: "GlobeExport",
-    status: "pending",
-    batchCode: "CR-2023-05-12-002",
-    priority: "medium",
-  },
   {
     id: "order-3",
     title: "Thompson - 8 Pallets",
@@ -79,28 +63,16 @@ function SortableOrder({ order }: SortableOrderProps) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card className="mb-3 cursor-grab active:cursor-grabbing">
-        <CardHeader className="p-3 pb-0">
+      <Card className="mb-3 cursor-grab active:cursor-grabbing flex flex-row items-center justify-between">
+        <CardHeader className="p-3 border-1 ml-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">{order.title}</span>
-            <Badge
-              variant={
-                order.priority === "high" ? "destructive" : order.priority === "medium" ? "default" : "secondary"
-              }
-              className="text-xs"
-            >
-              {order.priority}
-            </Badge>
+            <span className="border-1 text-sm font-medium">{order.title}</span>
           </div>
         </CardHeader>
-        <CardContent className="p-3 pt-2">
-          <p className="text-xs text-muted-foreground">{order.customer}</p>
-          <p className="mt-1 text-xs font-mono">{order.batchCode}</p>
+        <CardContent className="border-1 flex flex-row items-center">
+          <p className="border-1 text-xs text-muted-foreground pr-3">{order.customer}</p>
+          <p className="border-1 mt-1 text-xs font-mono">{order.batchCode}</p>
         </CardContent>
-        <CardFooter className="p-3 pt-0 text-xs text-muted-foreground">
-          <MoveHorizontal className="mr-1 h-3 w-3" />
-          Drag to change status
-        </CardFooter>
       </Card>
     </div>
   )
@@ -137,7 +109,6 @@ function KanbanColumn({ title, orders, icon, count }: KanbanColumnProps) {
 export function KanbanBoard() {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
 
-  const pendingOrders = orders.filter((order) => order.status === "pending")
   const processingOrders = orders.filter((order) => order.status === "processing")
   const completedOrders = orders.filter((order) => order.status === "completed")
 
@@ -171,14 +142,8 @@ export function KanbanBoard() {
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <SortableContext items={orders.map((order) => order.id)} strategy={horizontalListSortingStrategy}>
-          <KanbanColumn
-            title="Pending"
-            orders={pendingOrders}
-            icon={<Clock className="h-4 w-4 text-amber-500" />}
-            count={pendingOrders.length}
-          />
           <KanbanColumn
             title="In Process"
             orders={processingOrders}
