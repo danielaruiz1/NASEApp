@@ -3,12 +3,12 @@
 import type React from "react"
 
 import { useState } from "react"
-import { DndContext, type DragEndEvent, closestCenter } from "@dnd-kit/core"
+import { DndContext, type DragEndEvent, closestCenter, useDroppable } from "@dnd-kit/core"
 import { SortableContext, arrayMove, horizontalListSortingStrategy, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { AlertCircle, CheckCircle2, Clock, MoveHorizontal } from "lucide-react"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 type OrderStatus = "processing" | "completed"
 
@@ -58,12 +58,12 @@ function SortableOrder({ order }: SortableOrderProps) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || "transform 200ms cubic-bezier(0.22, 1, 0.36, 1)",
   }
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card className="mb-3 cursor-grab active:cursor-grabbing flex flex-row flex-wrap items-center">
+      <Card className="mb-3 cursor-grab active:cursor-grabbing flex flex-row flex-wrap items-center transition-shadow duration-200 hover:shadow-lg">
         <CardHeader className="border-0 w-30 flex p-0 ml-4 flex-1 min-w-30 items-center">
           <div className="flex items-center justify-between min-w-0">
             <span className="text-sm font-medium flex-1 min-w-0 whitespace-normal break-words">{order.title}</span>
@@ -86,6 +86,8 @@ interface KanbanColumnProps {
 }
 
 function KanbanColumn({ title, orders, icon, count }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: title })
+
   return (
     <div className="flex flex-col rounded-lg border bg-muted/50 p-3">
       <div className="mb-3 flex items-center justify-between">
@@ -97,10 +99,22 @@ function KanbanColumn({ title, orders, icon, count }: KanbanColumnProps) {
           {count}
         </Badge>
       </div>
-      <div className="flex-1">
-        {orders.map((order) => (
-          <SortableOrder key={order.id} order={order} />
-        ))}
+      <div className="flex-1 min-h-[48px]" ref={setNodeRef}>
+        <SortableContext items={orders.map((order) => order.id)} strategy={horizontalListSortingStrategy}>
+          {orders.length === 0 ? (
+            <div
+              className={`rounded border border-dashed border-muted-foreground/40 p-4 text-xs text-muted-foreground text-center select-none transition-colors duration-200
+                ${isOver ? "bg-blue-100 border-blue-400 text-blue-600" : ""}
+              `}
+            >
+              Arrastra aquí para mover
+            </div>
+          ) : (
+            orders.map((order) => (
+              <SortableOrder key={order.id} order={order} />
+            ))
+          )}
+        </SortableContext>
       </div>
     </div>
   )
@@ -120,9 +134,22 @@ export function KanbanBoard() {
     const activeOrder = orders.find((order) => order.id === active.id)
     const overOrder = orders.find((order) => order.id === over.id)
 
-    if (!activeOrder || !overOrder) return
+    if (!activeOrder || !overOrder) {
+      // Si se hace drop en una columna vacía, over.id será el título de la columna
+      // Detecta a qué columna corresponde y actualiza el status
+      if (over && (over.id === "In Process" || over.id === "Completed")) {
+        setOrders(
+          orders.map((order) =>
+            order.id === active.id
+              ? { ...order, status: over.id === "In Process" ? "processing" : "completed" }
+              : order
+          )
+        )
+      }
+      return
+    }
 
-    // If dragging to a different column, update status
+    // Si dragging entre columnas, actualiza status
     if (activeOrder.status !== overOrder.status) {
       const updatedOrders = orders.map((order) => {
         if (order.id === activeOrder.id) {
@@ -134,7 +161,7 @@ export function KanbanBoard() {
       return
     }
 
-    // If in the same column, reorder
+    // Si en la misma columna, reordena
     const oldIndex = orders.findIndex((order) => order.id === active.id)
     const newIndex = orders.findIndex((order) => order.id === over.id)
     setOrders(arrayMove(orders, oldIndex, newIndex))
@@ -143,20 +170,18 @@ export function KanbanBoard() {
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SortableContext items={orders.map((order) => order.id)} strategy={horizontalListSortingStrategy}>
-          <KanbanColumn
-            title="In Process"
-            orders={processingOrders}
-            icon={<AlertCircle className="h-4 w-4 text-blue-500" />}
-            count={processingOrders.length}
-          />
-          <KanbanColumn
-            title="Completed"
-            orders={completedOrders}
-            icon={<CheckCircle2 className="h-4 w-4 text-green-500" />}
-            count={completedOrders.length}
-          />
-        </SortableContext>
+        <KanbanColumn
+          title="In Process"
+          orders={processingOrders}
+          icon={<AlertCircle className="h-4 w-4 text-blue-500" />}
+          count={processingOrders.length}
+        />
+        <KanbanColumn
+          title="Completed"
+          orders={completedOrders}
+          icon={<CheckCircle2 className="h-4 w-4 text-green-500" />}
+          count={completedOrders.length}
+        />
       </div>
     </DndContext>
   )
