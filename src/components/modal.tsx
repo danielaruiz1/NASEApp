@@ -27,7 +27,8 @@ export function Modal({ isOpen, onClose, children, title, description, size = `m
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+         onClick={onClose}>
       <div 
         className={`bg-background rounded-lg border shadow-lg w-full ${sizeClasses[size]} mx-auto`}
         onClick={(e) => e.stopPropagation()}

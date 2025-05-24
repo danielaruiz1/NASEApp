@@ -185,7 +185,7 @@ export function AddNewOrder({onSuccess}: ExportNewOrderProps) {
                 required
                 value={formData.etiqueta}
                 onChange={handleChange}>
-                <option value="" disabled hidden>Selecciona una etiqueta</option>
+                <option value="" disabled hidden>Selecciona etiqueta</option>
                 <option value="MT">MT (1)</option>
                 <option value="MTO">MTO (2)</option>
               </select>
