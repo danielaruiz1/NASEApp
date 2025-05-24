@@ -171,13 +171,13 @@ export function KanbanBoard() {
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <KanbanColumn
-          title="In Process"
+          title="En Proceso"
           orders={processingOrders}
           icon={<AlertCircle className="h-4 w-4 text-blue-500" />}
           count={processingOrders.length}
         />
         <KanbanColumn
-          title="Completed"
+          title="Completado"
           orders={completedOrders}
           icon={<CheckCircle2 className="h-4 w-4 text-green-500" />}
           count={completedOrders.length}
