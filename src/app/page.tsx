@@ -1,12 +1,14 @@
-
+'use client'
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { Modal }  from "@/components/modal"
 
 import { KanbanBoard } from "@/components/kanban-board"
-// import { OrdersTable } from "@/components/orders-table"
 
 export default function DashboardPage() {
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -22,10 +24,10 @@ export default function DashboardPage() {
           <Tabs defaultValue="overview">
             <div className="flex items-center">
               <div className="ml-auto flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  Export to SAP
+                <Button variant="outline" size="sm" onClick={() => setIsExportModalOpen(true)}>
+                  Exportar
                 </Button>
-                <Button size="sm">New Order</Button>
+                <Button size="sm">Nueva Orden</Button>
               </div>
             </div>
             <TabsContent value="overview" className="space-y-4">
@@ -41,6 +43,16 @@ export default function DashboardPage() {
               </div>
             </TabsContent>
           </Tabs>
+          <Modal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            title="Exportar a SAP"
+            description="Configura los parámetros de exportación"
+          >
+            <div className="space-y-4">
+              <p>Contenido del modal de exportación aquí...</p>
+            </div>
+          </Modal>
         </main>
       </div>
     </div>
